@@ -1,0 +1,10 @@
+.DS_Store
+.build/
+*.xcodeproj
+xcuserdata/
+
+# Stray SwiftPM intermediate artifacts (should never be tracked)
+*.o
+*.d
+*.dia
+*.swiftdeps
