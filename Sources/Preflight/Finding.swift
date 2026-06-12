@@ -59,4 +59,29 @@ public struct Finding: Identifiable, Equatable, Codable, Sendable {
         self.fix = fix
         self.args = args
     }
+
+    /// Convenience initializer for findings that don't need a distinct
+    /// localization template key: `code` defaults to `id` and `args` is empty.
+    /// Use the full initializer when a downstream consumer localizes by `code`.
+    public init(
+        id: String,
+        severity: Severity,
+        category: Category,
+        guideline: String?,
+        title: String,
+        message: String,
+        fix: String?
+    ) {
+        self.init(
+            id: id,
+            code: id,
+            severity: severity,
+            category: category,
+            guideline: guideline,
+            title: title,
+            message: message,
+            fix: fix,
+            args: [:]
+        )
+    }
 }
