@@ -1,6 +1,17 @@
-# Preflight
+<p align="center">
+  <img src="Assets/preflight-banner.png" alt="Preflight" width="100%">
+</p>
 
-**Parse an iOS build artifact and run deterministic, build-only App Store checks — 100% local.**
+<p align="center">
+  <strong>Parse an iOS build artifact and run deterministic, build-only App Store checks — 100% local.</strong>
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Swift-6.0-orange.svg" alt="Swift 6.0">
+  <img src="https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey.svg" alt="macOS 13+">
+  <img src="https://img.shields.io/badge/network-zero-brightgreen.svg" alt="Zero network">
+  <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT">
+</p>
 
 Preflight is a small Swift library (plus a thin CLI) that opens an iOS build
 (`.ipa` or `.xcarchive`), extracts structured **facts** from it, and runs a set of
@@ -36,7 +47,7 @@ Connect, never uses an LLM, and never executes the binary.
 Swift Package Manager — add the dependency:
 
 ```swift
-.package(url: "https://github.com/your-org/preflight.git", from: "1.0.0")
+.package(url: "https://github.com/Sakaax/preflight.git", from: "1.0.0")
 ```
 
 ```swift
@@ -106,6 +117,8 @@ it's a trivial swap of one conforming type. The core library is Foundation-only;
 app-icon extraction is the only ImageIO-guarded bit and is opt-in.
 
 ## Relationship to Cleared
+
+<img src="Assets/cleared-logo.png" alt="Cleared" width="56" align="left" hspace="12">
 
 Preflight is the open-source build-parsing-and-checks core extracted from
 **Cleared** ([cleared.sakaax.com](https://cleared.sakaax.com)), a closed macOS
