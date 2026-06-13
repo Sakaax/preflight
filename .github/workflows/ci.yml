@@ -2,9 +2,10 @@ name: CI
 on: [push, pull_request]
 jobs:
   macos:
-    runs-on: macos-14
+    runs-on: macos-15
     steps:
       - uses: actions/checkout@v4
+      - run: swift --version
       - run: swift build
       - run: swift test
   linux:
