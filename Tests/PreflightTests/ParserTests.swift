@@ -1,5 +1,6 @@
 import Foundation
 import Testing
+import ZIPFoundation
 @testable import Preflight
 
 @Suite("Parser")
@@ -82,34 +83,18 @@ struct ParserTests {
         #expect(facts.trackingDomains == ["tracker.example.com"])
     }
 
-    @Test("Parses a synthetic .ipa via DittoExtractor")
+    @Test("Parses a synthetic .ipa via ZipExtractor (cross-platform)")
     func parseIPA() throws {
         let (_, payload, tempRoot) = try makeSyntheticArchive()
         defer { try? FileManager.default.removeItem(at: tempRoot) }
 
-        #if os(macOS)
         let fm = FileManager.default
-        // Guard: skip gracefully if ditto is unavailable.
-        guard fm.fileExists(atPath: "/usr/bin/ditto") else { return }
 
-        // Zip Payload/ into Test.ipa using ditto (mirrors how Xcode packages .ipa).
-        // A real .ipa has `Payload/` at the zip root, so we zip the directory that
-        // CONTAINS Payload, taking its contents as the archive root.
-        let stage = tempRoot.appendingPathComponent("stage", isDirectory: true)
-        try fm.createDirectory(at: stage, withIntermediateDirectories: true)
-        try fm.copyItem(at: payload, to: stage.appendingPathComponent("Payload", isDirectory: true))
-
+        // Zip Payload/ into Test.ipa using ZIPFoundation (cross-platform).
+        // A real .ipa has `Payload/` at the zip root, so we zip the `Payload`
+        // directory itself; ZIPFoundation preserves it as the top-level entry.
         let ipaURL = tempRoot.appendingPathComponent("Test.ipa")
-        let zip = Process()
-        zip.executableURL = URL(fileURLWithPath: "/usr/bin/ditto")
-        zip.arguments = ["-c", "-k", "--sequesterRsrc", stage.path, ipaURL.path]
-        do {
-            try zip.run()
-        } catch {
-            return // ditto failed to launch; skip gracefully
-        }
-        zip.waitUntilExit()
-        guard zip.terminationStatus == 0 else { return }
+        try fm.zipItem(at: payload, to: ipaURL)
 
         let facts = BuildParser.parse(at: ipaURL, format: .ipa)
         #expect(facts.format == .ipa)
@@ -117,6 +102,5 @@ struct ParserTests {
         #expect(facts.bundleId == "com.example.test")
         #expect(facts.declaresTracking == true)
         #expect(facts.usageDescriptions["NSCameraUsageDescription"] != nil)
-        #endif
     }
 }

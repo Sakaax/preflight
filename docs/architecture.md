@@ -66,11 +66,11 @@ public protocol ArchiveExtractor: Sendable {
 }
 ```
 
-`DittoExtractor` is the macOS implementation (shells `/usr/bin/ditto -x -k`). To
-support Linux, add one conforming type (e.g. wrapping `libarchive` or `unzip`) and
-pass it to `BuildParser.parse(at:extractor:)`. Nothing else in the library is
-platform-bound except opt-in icon extraction, which is `#if canImport(ImageIO)`
-guarded and returns `nil` otherwise.
+`ZipExtractor` is the default implementation, backed by **ZIPFoundation** (pure
+Swift) — so it runs identically on **macOS and Linux**. You can supply your own
+conforming type and pass it to `BuildParser.parse(at:extractor:)` if you need a
+different backend. Nothing else in the library is platform-bound except opt-in icon
+extraction, which is `#if canImport(ImageIO)` guarded and returns `nil` on Linux.
 
 ## Concurrency
 

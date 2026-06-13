@@ -7,7 +7,7 @@ import Foundation
 /// Connect, no AI, no licensing.
 public enum Preflight {
     /// The Preflight library version.
-    public static let version = "1.0.0"
+    public static let version = "1.1.0"
 
     /// Parses the build at `url` and runs the standard build-only checks.
     ///

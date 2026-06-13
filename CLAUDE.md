@@ -11,17 +11,18 @@ Entry point for any agent session on this repo. Read this first.
 
 ## What Preflight is
 
-A standalone Swift package: a Foundation-only library that opens an iOS build
-(`.ipa` / `.xcarchive`), extracts `BuildFacts`, and runs deterministic build-only
-`Check`s, plus a thin CLI (`preflight`). It is the open-source core extracted from
-the closed product **Cleared**.
+A standalone Swift package: a library (Foundation + ZIPFoundation) that opens an
+iOS build (`.ipa` / `.xcarchive`), extracts `BuildFacts`, and runs deterministic
+build-only `Check`s, plus a thin CLI (`preflight`). Cross-platform (macOS + Linux).
+It is the open-source core extracted from the closed product **Cleared**.
 
 Data flow: `URL → BuildParser.parse → BuildFacts → CheckEngine.buildOnly.run → [Finding]`.
 
 ## Hard rules (never break these)
 
-- **Core is Foundation-only.** The only exception is app-icon extraction, guarded
-  by `#if canImport(ImageIO)`.
+- **Dependencies stay minimal.** The core uses Foundation plus one dependency —
+  ZIPFoundation (pure-Swift, cross-platform unzip). The only platform-guarded code
+  is app-icon extraction, guarded by `#if canImport(ImageIO)`.
 - **Zero network. Ever.** No URLSession, no telemetry.
 - **No App Store Connect, no AI, no licensing, no network in the core.** Those
   live downstream in Cleared, never here. Don't add them.
@@ -30,11 +31,12 @@ Data flow: `URL → BuildParser.parse → BuildFacts → CheckEngine.buildOnly.r
 - **Never claim something the lib can't know.** Preflight doesn't read ASC labels,
   so a check must never say a label is "missing" — only what the build *embeds*.
 
-## The Linux seam
+## The platform seam (cross-platform)
 
 The one platform-specific operation — unzipping an `.ipa` — is behind the
-`ArchiveExtractor` protocol. `DittoExtractor` is the macOS impl
-(`/usr/bin/ditto`). Linux support = adding one conforming type, nothing else.
+`ArchiveExtractor` protocol. `ZipExtractor` is the default impl, backed by
+**ZIPFoundation** (pure Swift), so it runs identically on **macOS and Linux**. CI
+builds and tests on both (see `.github/workflows/ci.yml`).
 
 ## Build discipline
 

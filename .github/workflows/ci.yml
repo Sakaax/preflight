@@ -1,0 +1,17 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  macos:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift build
+      - run: swift test
+  linux:
+    runs-on: ubuntu-latest
+    container: swift:6.0
+    steps:
+      - uses: actions/checkout@v4
+      - run: apt-get update && apt-get install -y zlib1g-dev
+      - run: swift build
+      - run: swift test

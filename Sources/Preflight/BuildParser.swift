@@ -11,13 +11,13 @@ public enum BuildParser {
     /// - Parameters:
     ///   - url: The `.ipa` or `.xcarchive` URL.
     ///   - format: Override the format. If `nil`, inferred from `url`.
-    ///   - extractor: Used to unzip `.ipa` archives. Defaults to `DittoExtractor`.
+    ///   - extractor: Used to unzip `.ipa` archives. Defaults to `ZipExtractor` (cross-platform).
     ///   - extractIcon: Whether to extract the app icon (macOS/ImageIO only).
     /// - Returns: Extracted `BuildFacts`. On failure, a minimal facts value with `parseNote` set.
     public static func parse(
         at url: URL,
         format: BuildFormat? = nil,
-        extractor: ArchiveExtractor = DittoExtractor(),
+        extractor: ArchiveExtractor = ZipExtractor(),
         extractIcon: Bool = false
     ) -> BuildFacts {
         let resolvedFormat = format ?? BuildFormat.infer(from: url)

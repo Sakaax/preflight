@@ -7,8 +7,9 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/Sakaax/preflight/actions/workflows/ci.yml"><img src="https://github.com/Sakaax/preflight/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
   <img src="https://img.shields.io/badge/Swift-6.0-orange.svg" alt="Swift 6.0">
-  <img src="https://img.shields.io/badge/platform-macOS%2013%2B-lightgrey.svg" alt="macOS 13+">
+  <img src="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-lightgrey.svg" alt="macOS | Linux">
   <img src="https://img.shields.io/badge/network-zero-brightgreen.svg" alt="Zero network">
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT">
 </p>
@@ -99,7 +100,8 @@ your build by itself). It only exits non-zero when the path doesn't exist.
 
 ## Guarantees
 
-- **100% local.** Reads files only. **Zero network.** No telemetry.
+- **100% local.** Reads files only. **Zero network.** No telemetry. One dependency —
+  **ZIPFoundation** (pure Swift, cross-platform unzip). Still zero network, no telemetry.
 - **No App Store Connect.** Preflight never reads your ASC metadata or privacy
   labels — the ASC cross-checks live in the closed product, not here.
 - **No AI.** Every check is deterministic Swift.
@@ -110,11 +112,12 @@ See [`docs/security.md`](docs/security.md) for the threat model.
 
 ## Platform support
 
-macOS-only for V1. The single platform-specific piece — unzipping an `.ipa` — is
-isolated behind the `ArchiveExtractor` protocol (the macOS implementation,
-`DittoExtractor`, shells out to `/usr/bin/ditto`). **Linux support is planned**:
-it's a trivial swap of one conforming type. The core library is Foundation-only;
-app-icon extraction is the only ImageIO-guarded bit and is opt-in.
+**macOS and Linux.** The single platform-specific piece — unzipping an `.ipa` — is
+isolated behind the `ArchiveExtractor` protocol, and the default implementation
+(`ZipExtractor`) uses **ZIPFoundation** (pure Swift) so it works identically on both
+platforms. This means you can **parse iOS builds in CI on Linux, no Mac required**.
+App-icon extraction is the only ImageIO-guarded bit (`#if canImport(ImageIO)`); it
+is opt-in and simply returns `nil` on Linux.
 
 ## Relationship to Cleared
 

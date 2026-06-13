@@ -19,8 +19,10 @@ for `.ipa` extraction.
 
 ### Zero network
 
-The `Preflight` library imports `Foundation` only (plus an `#if canImport(ImageIO)`
-guard for icon extraction). There is **no** `URLSession`, no socket, no HTTP, no
+The `Preflight` library imports `Foundation` and **ZIPFoundation** only (plus an
+`#if canImport(ImageIO)` guard for icon extraction). ZIPFoundation is a pure-Swift,
+cross-platform unzip library that reads and writes files — it does no networking.
+There is **no** `URLSession`, no socket, no HTTP, no
 DNS, no analytics, no crash reporting, no telemetry of any kind. It cannot contact
 App Store Connect, an LLM, or any server, because no such code exists in the
 package. You can verify this by grepping the sources.
@@ -37,12 +39,12 @@ them — it only reports what your build *embeds*, leaving the cross-check to yo
 Preflight never runs the app executable or any code from the build. It only parses
 data files (`PropertyListSerialization` on plists, a directory listing for
 frameworks, image decoding for the optional icon). There is no `dlopen`, no
-`Process` invocation of the build, no script execution.
+`Process` invocation of the build, no script execution — and no subprocess at all.
 
-The one `Process` it does spawn is `/usr/bin/ditto` (via `DittoExtractor`), strictly
-to unzip an `.ipa` into a temp directory — a standard, read-only-in-effect
-extraction. This is isolated behind the `ArchiveExtractor` protocol so it can be
-swapped or audited independently.
+Unzipping an `.ipa` into a temp directory is done in-process by **ZIPFoundation**
+(pure Swift, cross-platform) via the default `ZipExtractor` — it reads the archive's
+bytes and writes the extracted files, never executing anything. This is isolated
+behind the `ArchiveExtractor` protocol so it can be swapped or audited independently.
 
 ### Temp directories are cleaned
 
@@ -58,7 +60,8 @@ failure path. No extracted build contents are left behind.
 
 ## Auditing
 
-The package is small and Foundation-only. To verify the network claim:
+The package is small, with a single dependency (ZIPFoundation, pure-Swift unzip).
+To verify the network claim:
 
 ```bash
 grep -rEi 'URLSession|http|socket|Network|telemetry|analytics' Sources/
